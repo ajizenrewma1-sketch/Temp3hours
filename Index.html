@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคัดกรองยอดน้อง Temp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .table-container {
+            max-height: 550px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .btn-gradient {
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <header class="mb-10 text-center">
+            <div class="inline-block p-2 px-4 rounded-full bg-blue-100 text-blue-700 text-sm font-bold mb-3 shadow-sm">
+                SALES EXTRACTOR v2.0
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">ระบบคัดกรองยอดน้อง Temp</h1>
+            <p class="text-slate-500 mt-2 text-lg">ดึงข้อมูลยอดเงินรายบุคคล อัตโนมัติและแม่นยำ</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left Side: Input Panel -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="glass-card p-6 rounded-2xl shadow-xl border border-white">
+                    <div class="flex items-center gap-2 mb-4 text-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <label class="text-lg font-bold">นำเข้าข้อมูลดิบ</label>
+                    </div>
+                    
+                    <textarea 
+                        id="rawInput" 
+                        class="w-full h-96 p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all resize-none text-slate-700 leading-relaxed"
+                        placeholder="วางข้อมูลที่นี่...&#10;เช่น: นางสาวสลักใจ โพธิมา 500"></textarea>
+                    
+                    <div class="flex flex-col gap-3 mt-6">
+                        <button 
+                            onclick="processData()"
+                            class="btn-gradient w-full text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                            </svg>
+                            ประมวลผลทันที
+                        </button>
+                        <button 
+                            onclick="clearInput()"
+                            class="w-full text-slate-400 hover:text-red-500 font-medium py-2 transition-colors text-sm underline underline-offset-4">
+                            ล้างข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Table Display -->
+            <div class="lg:col-span-8">
+                <div class="glass-card p-6 rounded-2xl shadow-xl border border-white">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">ตารางสรุปยอดน้อง Temp</h2>
+                            <p class="text-slate-400 text-sm mt-1">อัปเดตข้อมูลล่าสุดตามรายการที่ระบุด้านซ้าย</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button 
+                                onclick="copySalesOnly()"
+                                class="bg-white hover:bg-emerald-50 text-emerald-600 border-2 border-emerald-500 text-sm font-bold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2 shadow-sm active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                                </svg>
+                                คัดลอกยอดเงิน
+                            </button>
+                            <div id="statusCount" class="bg-blue-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md min-w-[100px] text-center transition-all duration-300">
+                                พบ 0 คน
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container rounded-xl border border-slate-200 shadow-inner bg-white">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">ลำดับ</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">ชื่อ-นามสกุล</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Username</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-widest">ยอดเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultBody" class="divide-y divide-slate-100 bg-white">
+                                <!-- Data injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 p-4 rounded-xl bg-slate-800 text-white flex justify-between items-center shadow-lg">
+                        <span class="text-slate-400 font-medium">รวมยอดเงินสุทธิ</span>
+                        <div class="flex items-baseline gap-1">
+                            <span id="totalSum" class="text-3xl font-black">0</span>
+                            <span class="text-sm text-slate-400">บาท</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const staffList = [
+            { name: "นางสาวสลักใจ โพธิมา", username: "MLPR_Salakjai.pot" },
+            { name: "นางสาวกรวรรณ บัวแดง", username: "MLPR_Korawan.bua" },
+            { name: "นางสาวโสรยา บุญประเสริฐ", username: "MLPR_Soraya.boo" },
+            { name: "นางสาวรัชนี ใจดี", username: "MLPR_ruchanee.jai" },
+            { name: "นางสาวนิติกาญจน์ อินทร์เขาย้อย", username: "MLPR_Nithikan.ink" },
+            { name: "นางสาวกนกวรรณ อาดัม", username: "MLPR_Kanokwan.ard" },
+            { name: "นางสาวฮิจเราะห นุชจำลอง", username: "MLPR_Hijjaroh.nuc" },
+            { name: "นางสาวอินทิรา บางใหญ่", username: "" },
+            { name: "นางสาวนิศรา บางใหญ่", username: "MLPR_Nitsara.ban" },
+            { name: "นางสาวปณิษฐา เจ๊ะดอเลาะ", username: "MLPR_Panidtha.jeh" },
+            { name: "นางสาวณัฐชา มีผล", username: "MLPR_Nattachar.mee" },
+            { name: "นายปุญญพัฒน์ คำหวาน", username: "MLPR_Poonyapat.kumw" },
+            { name: "นางสาวอรอุมา พลวงค์", username: "MLPR_Onauma.phon" },
+            { name: "นางสาวอลินา บุญมาเลิศ", username: "MLPR_Alina.bun" },
+            { name: "นางสาวจิราพร หวนคนึง", username: "MLPR_Jiraporn.hua" },
+            { name: "นายวิวรรธน์ วงศ์พิมพ์", username: "MLPR_Wiwat.won" },
+            { name: "นางสาวธิญาพร จาดรัมย์", username: "MLPR_Thiyaphon.cha" },
+            { name: "สิริรัตน์ ว่องไว", username: "MLPR_Sirirat.wo" },
+            { name: "นายประพันธ์ แซ่หลี", username: "MLPR_Praphan.sae" },
+            { name: "นางสาวอมรรัตน์ จิตรสุคนธ์", username: "MLPR_Amonrut.chi" },
+            { name: "นางสาวจิตรา มีผล", username: "MLPR_Jitra.me" },
+            { name: "นางสาวยมณา ลาเตะ", username: "MLPR_Yumna.lat" },
+            { name: "นายพชรพล ฝั้นนา", username: "MLPR_Potcharapol.fan" },
+            { name: "นายอรกนก  ฉาบเพ็ชร์", username: "MLPR_Onkanok.cha" },
+            { name: "นางสาวกาญจนา อาดัม", username: "MLPR_kanjana.adu" },
+            { name: "นางสาวอัยดา บุญเลาะ", username: "MLPR_Aiyada.boo" },
+            { name: "นางสาววนัสนันท์ จิวานิชวรกุล", username: "MLPR_Wanatsanan.jiw" },
+            { name: "นางสาวอาทิตยา ทับทิม", username: "MLPR_Arthitaya.thb" },
+            { name: "นางสาวพิชชาพร คำภานนท์", username: "MLPR_Pitchaporn.kam" },
+            { name: "ชัชวาล ว่าขานฤทธี", username: "MLPR_Chatchawan.wak" },
+            { name: "บริราช ศรีหาวงค์", username: "MLPR_Borriraj.sri" }
+        ];
+
+        let currentSalesData = [];
+
+        function processData() {
+            const rawText = document.getElementById('rawInput').value;
+            const lines = rawText.split('\n');
+            const resultBody = document.getElementById('resultBody');
+            const totalSumEl = document.getElementById('totalSum');
+            const statusCountEl = document.getElementById('statusCount');
+
+            const salesMap = new Map();
+            let grandTotal = 0;
+            let foundCount = 0;
+            currentSalesData = [];
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return;
+
+                staffList.forEach(staff => {
+                    const escapedName = staff.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const escapedUser = staff.username ? staff.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : null;
+                    
+                    let pattern;
+                    if (escapedUser) {
+                        pattern = new RegExp(`(${escapedName}|${escapedUser})\\s*[:\\-\\s=]*\\s*([\\d,]+\\.?\\d*)`, 'i');
+                    } else {
+                        pattern = new RegExp(`(${escapedName})\\s*[:\\-\\s=]*\\s*([\\d,]+\\.?\\d*)`, 'i');
+                    }
+
+                    const match = trimmedLine.match(pattern);
+                    if (match && match[2]) {
+                        const amount = parseFloat(match[2].replace(/,/g, ''));
+                        if (!isNaN(amount)) {
+                            const currentVal = salesMap.get(staff.name) || 0;
+                            salesMap.set(staff.name, currentVal + amount);
+                        }
+                    }
+                });
+            });
+
+            resultBody.innerHTML = '';
+            staffList.forEach((staff, index) => {
+                const amount = salesMap.get(staff.name);
+                const hasValue = amount !== undefined;
+                
+                let amountValue = hasValue ? Math.round(amount) : 0;
+                let amountText = hasValue ? amountValue.toString() : "";
+                
+                currentSalesData.push(amountText);
+
+                if (hasValue) {
+                    grandTotal += amountValue;
+                    foundCount++;
+                }
+
+                const row = document.createElement('tr');
+                row.className = hasValue ? "bg-blue-50/40" : "text-slate-300";
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-400">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${hasValue ? 'text-slate-800' : 'text-slate-300'}">${staff.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-xs font-mono">${staff.username || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-base font-black ${hasValue ? 'text-blue-600' : ''}">
+                        ${amountText}
+                    </td>
+                `;
+                resultBody.appendChild(row);
+            });
+
+            totalSumEl.innerText = Math.round(grandTotal).toString();
+            statusCountEl.innerText = `พบ ${foundCount} คน`;
+        }
+
+        function copySalesOnly() {
+            if (currentSalesData.length === 0) return;
+            const textToCopy = currentSalesData.join('\n');
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const statusCount = document.getElementById('statusCount');
+            const originalBg = statusCount.className;
+            const originalText = statusCount.innerText;
+            
+            statusCount.className = "bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md min-w-[100px] text-center transition-all duration-300";
+            statusCount.innerText = "คัดลอกสำเร็จ!";
+            
+            setTimeout(() => {
+                statusCount.className = originalBg;
+                statusCount.innerText = originalText;
+            }, 2000);
+        }
+
+        function clearInput() {
+            document.getElementById('rawInput').value = '';
+            processData();
+        }
+
+        window.onload = processData;
+    </script>
+</body>
+</html>
