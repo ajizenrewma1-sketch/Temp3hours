@@ -41,6 +41,13 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -58,33 +65,73 @@
             <!-- Left Side: Input Panel -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-card p-6 rounded-2xl shadow-xl border border-white">
-                    <div class="flex items-center gap-2 mb-4 text-slate-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <label class="text-lg font-bold">นำเข้าข้อมูลดิบ</label>
+                    
+                    <!-- Tabs Header -->
+                    <div class="flex gap-2 border-b border-slate-200 mb-6 pb-2">
+                        <button id="tabSales" onclick="switchTab('sales')" class="text-blue-600 font-bold border-b-2 border-blue-600 pb-2 px-2 transition-all flex-1 text-center">1. ประมวลผลยอด</button>
+                        <button id="tabStaff" onclick="switchTab('staff')" class="text-slate-400 font-medium pb-2 px-2 hover:text-slate-600 transition-all flex-1 text-center border-b-2 border-transparent">2. ตั้งค่ารายชื่อ</button>
                     </div>
-                    
-                    <textarea 
-                        id="rawInput" 
-                        class="w-full h-96 p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all resize-none text-slate-700 leading-relaxed"
-                        placeholder="วางข้อมูลที่นี่...&#10;เช่น: นางสาวสลักใจ โพธิมา 500"></textarea>
-                    
-                    <div class="flex flex-col gap-3 mt-6">
-                        <button 
-                            onclick="processData()"
-                            class="btn-gradient w-full text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 001.555-.832l-3-2z" clip-rule="evenodd" />
+
+                    <!-- Tab Content: Sales Input -->
+                    <div id="contentSales" class="space-y-6 block animate-fade-in">
+                        <div class="flex items-center gap-2 mb-4 text-slate-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            ประมวลผลทันที
-                        </button>
-                        <button 
-                            onclick="clearInput()"
-                            class="w-full text-slate-400 hover:text-red-500 font-medium py-2 transition-colors text-sm underline underline-offset-4">
-                            ล้างข้อมูลทั้งหมด
-                        </button>
+                            <label class="text-lg font-bold">นำเข้าข้อมูลดิบ</label>
+                        </div>
+                        
+                        <textarea 
+                            id="rawInput" 
+                            class="w-full h-[350px] p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all resize-none text-slate-700 leading-relaxed"
+                            placeholder="วางข้อมูลที่นี่...&#10;เช่น: นางสาวสลักใจ โพธิมา 500"></textarea>
+                        
+                        <div class="flex flex-col gap-3 mt-6">
+                            <button 
+                                onclick="processData()"
+                                class="btn-gradient w-full text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 001.555-.832l-3-2z" clip-rule="evenodd" />
+                                </svg>
+                                ประมวลผลทันที
+                            </button>
+                            <button 
+                                onclick="clearInput()"
+                                class="w-full text-slate-400 hover:text-red-500 font-medium py-2 transition-colors text-sm underline underline-offset-4">
+                                ล้างข้อมูลทั้งหมด
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Tab Content: Staff Settings -->
+                    <div id="contentStaff" class="space-y-4 hidden animate-fade-in">
+                        <div class="flex items-center gap-2 mb-2 text-slate-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <label class="text-lg font-bold">รายชื่อพนักงาน</label>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-2">เพิ่ม/ลบ หรือสลับตำแหน่งได้เลย (1 บรรทัดต่อ 1 คน)<br/>รูปแบบ: <span class="font-bold text-slate-700">ชื่อ-นามสกุล [เว้นวรรค] Username</span></p>
+                        
+                        <textarea 
+                            id="staffInput" 
+                            class="w-full h-[350px] p-4 bg-emerald-50/50 border border-emerald-200 rounded-xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition-all resize-none text-slate-700 leading-relaxed text-sm whitespace-pre"
+                            placeholder="ตัวอย่าง:&#10;นางสาวใจดี รักเรียน MLPR_Jaidee.rak"></textarea>
+                        
+                        <div class="flex flex-col gap-3 mt-4">
+                            <button 
+                                onclick="saveStaffList()"
+                                class="bg-emerald-500 hover:bg-emerald-600 transition-colors w-full text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
+                                บันทึกรายชื่อและอัปเดตระบบ
+                            </button>
+                            <button 
+                                onclick="resetToDefaultStaff()"
+                                class="w-full text-slate-400 hover:text-orange-500 font-medium py-2 transition-colors text-sm underline underline-offset-4">
+                                คืนค่ารายชื่อตั้งต้น (รีเซ็ต)
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -141,7 +188,7 @@
     </div>
 
     <script>
-        const staffList = [
+        const defaultStaffList = [
             { name: "นางสาวสลักใจ โพธิมา", username: "MLPR_Salakjai.pot" },
             { name: "นางสาวกรวรรณ บัวแดง", username: "MLPR_Korawan.bua" },
             { name: "นางสาวโสรยา บุญประเสริฐ", username: "MLPR_Soraya.boo" },
@@ -185,7 +232,126 @@
             { name: "นางสาวภัทรจิราภรณ์ จำปาวัลย์", username: "MLPR_Phatjiraporn.jam" }
         ];
 
+        let staffList = [];
         let currentSalesData = [];
+
+        function initApp() {
+            // โหลดรายชื่อที่ถูกบันทึกไว้ในเบราว์เซอร์ ถ้าไม่มีให้ใช้ค่าเริ่มต้น
+            const savedList = localStorage.getItem('savedStaffList_v3');
+            if (savedList) {
+                try {
+                    staffList = JSON.parse(savedList);
+                } catch(e) {
+                    staffList = [...defaultStaffList];
+                }
+            } else {
+                staffList = [...defaultStaffList];
+            }
+            
+            updateStaffTextarea();
+            processData();
+        }
+
+        function switchTab(tab) {
+            const salesTab = document.getElementById('tabSales');
+            const staffTab = document.getElementById('tabStaff');
+            const salesContent = document.getElementById('contentSales');
+            const staffContent = document.getElementById('contentStaff');
+
+            if (tab === 'sales') {
+                salesTab.className = "text-blue-600 font-bold border-b-2 border-blue-600 pb-2 px-2 transition-all flex-1 text-center";
+                staffTab.className = "text-slate-400 font-medium pb-2 px-2 hover:text-slate-600 transition-all flex-1 text-center border-b-2 border-transparent";
+                salesContent.classList.remove('hidden');
+                staffContent.classList.add('hidden');
+            } else {
+                staffTab.className = "text-emerald-600 font-bold border-b-2 border-emerald-600 pb-2 px-2 transition-all flex-1 text-center";
+                salesTab.className = "text-slate-400 font-medium pb-2 px-2 hover:text-slate-600 transition-all flex-1 text-center border-b-2 border-transparent";
+                staffContent.classList.remove('hidden');
+                salesContent.classList.add('hidden');
+            }
+        }
+
+        function updateStaffTextarea() {
+            const text = staffList.map(s => {
+                if (s.username) return `${s.name} ${s.username}`;
+                return s.name;
+            }).join('\n');
+            document.getElementById('staffInput').value = text;
+        }
+
+        function saveStaffList() {
+            const text = document.getElementById('staffInput').value;
+            const lines = text.split('\n');
+            const newList = [];
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                let cleanLine = trimmed.replace(/"/g, ''); // เอาเครื่องหมายคำพูดออก
+                // ค้นหา Username ที่มักจะเป็นภาษาอังกฤษต่อท้าย
+                const match = cleanLine.match(/(.+?)\s+([a-zA-Z0-9_.]+)$/);
+                
+                if (match) {
+                    newList.push({ 
+                        name: match[1].trim().replace(/\s+/g, ' '), 
+                        username: match[2].trim() 
+                    });
+                } else {
+                    // หากไม่พบรูปแบบชัดเจน ให้ตรวจสอบการเว้นวรรคด้วย Tab
+                    if (cleanLine.includes('\t')) {
+                        const parts = cleanLine.split('\t');
+                        newList.push({ 
+                            name: parts[0].trim().replace(/\s+/g, ' '), 
+                            username: parts[1] ? parts[1].trim() : '' 
+                        });
+                    } else {
+                        newList.push({ 
+                            name: cleanLine.replace(/\s+/g, ' '), 
+                            username: '' 
+                        });
+                    }
+                }
+            });
+
+            if (newList.length === 0) {
+                showToast("ไม่พบข้อมูลรายชื่อ โปรดตรวจสอบอีกครั้ง", "error");
+                return;
+            }
+
+            staffList = newList;
+            localStorage.setItem('savedStaffList_v3', JSON.stringify(staffList));
+            
+            updateStaffTextarea();
+            processData();
+            switchTab('sales');
+            showToast(`อัปเดตรายชื่อสำเร็จ (${staffList.length} คน)`);
+        }
+
+        function resetToDefaultStaff() {
+            staffList = [...defaultStaffList];
+            localStorage.setItem('savedStaffList_v3', JSON.stringify(staffList));
+            updateStaffTextarea();
+            processData();
+            showToast("คืนค่ารายชื่อเริ่มต้นเรียบร้อยแล้ว");
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
+            toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold shadow-xl transition-all duration-300 z-50 translate-y-[-150%] ${bgColor}`;
+            toast.innerText = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 10);
+
+            setTimeout(() => {
+                toast.style.transform = 'translate(-50%, -150%)';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
 
         function processData() {
             const rawText = document.getElementById('rawInput').value;
@@ -286,7 +452,7 @@
             processData();
         }
 
-        window.onload = processData;
+        window.onload = initApp;
     </script>
 </body>
 </html>
